@@ -5,6 +5,8 @@ from rest_framework import status
 from .serializers import WorkerCreateSerializer
 from .utils import generate_qr_base64
 from .models import Worker
+from rest_framework import generics
+
 from drf_spectacular.utils import extend_schema
 
 def scan_view(request):
