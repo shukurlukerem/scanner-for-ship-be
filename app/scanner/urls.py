@@ -1,13 +1,8 @@
-from django.contrib import admin
+# app/urls.py
 from django.urls import path
-from scanner.views import scan_view
-from django.conf import settings
-from django.conf.urls.static import static
+from .views import GenerateQRAPIView, WorkerListAPIView
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("scan/", scan_view, name="scan"),
+    path("generate-qr/", GenerateQRAPIView.as_view(), name="generate-qr"),
+    path("workers/", WorkerListAPIView.as_view(), name="worker-list"),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
