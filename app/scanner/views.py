@@ -2,13 +2,15 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import WorkerCreateSerializer
 from .utils import generate_qr_base64
-from .models import Worker, ScannerLog
 from rest_framework import generics
 from drf_spectacular.utils import extend_schema
 from django.utils import timezone
 from datetime import timedelta
+
+from .serializers import WorkerCreateSerializer, WorkerListSerializer
+from .pagination import DefaultPagination
+from .models import Worker, ScannerLog
 
 def scan_view(request):
     return render(request, "scanner/scan.html")
@@ -104,3 +106,8 @@ class ScanAPIView(APIView):
                 "scan_type": "exit",
                 "detail": "Çıxış qeydə alındı"
             })
+        
+class WorkerListAPIView(generics.ListAPIView):
+    queryset = Worker.objects.all().order_by("-id")
+    serializer_class = WorkerListSerializer
+    pagination_class = DefaultPagination

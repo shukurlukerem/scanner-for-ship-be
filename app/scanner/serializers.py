@@ -18,3 +18,8 @@ class ScannerLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScannerLog
         fields = ["id", "worker", "scan_type", "scanned_at"]
+
+class WorkerListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Worker
+        fields = ["id", "full_name", "qr_code", "created_at"]
