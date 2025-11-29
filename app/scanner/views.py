@@ -6,7 +6,6 @@ from .serializers import WorkerCreateSerializer
 from .utils import generate_qr_base64
 from .models import Worker
 from rest_framework import generics
-
 from drf_spectacular.utils import extend_schema
 
 def scan_view(request):
@@ -15,8 +14,6 @@ def scan_view(request):
 
 @extend_schema(
     request=WorkerCreateSerializer,
-    summary="Worker üçün QR code yarat",
-    description="Full name göndər → base64 QR code yaradır"
 )
 class GenerateQRAPIView(APIView):
     def post(self, request):
@@ -35,7 +32,3 @@ class GenerateQRAPIView(APIView):
             "qr_code": worker.qr_code
         }, status=201)
 
-
-class WorkerListAPIView(generics.ListAPIView):
-    queryset = Worker.objects.all().order_by("-id")
-    serializer_class = WorkerCreateSerializer
