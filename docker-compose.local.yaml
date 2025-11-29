@@ -1,0 +1,32 @@
+services:
+  api-ship:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: api-ship
+    command: bash -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./app:/code/app:z
+      - ./staticfiles:/code/app/staticfiles
+    ports:
+      - "8010:8000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres-ship
+
+  postgres-ship:
+    container_name: postgres-ship
+    image: postgres:15-bullseye
+    restart: always
+    environment:
+      POSTGRES_USER: ship_user
+      POSTGRES_PASSWORD: StrongP@ssw0rd
+      POSTGRES_DB: ship_db
+    ports:
+      - "5570:5432"
+    volumes:
+      - pgdb:/var/lib/postgresql/data
+
+volumes:
+  pgdb:
