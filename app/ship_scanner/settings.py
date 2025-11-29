@@ -183,7 +183,7 @@ SECRET_KEY = 'django-insecure-ki035yd3jlo9d3#3z*rl5bm2=qh)i2^rtug2%kj1$+hja*#%vz
 DEBUG = True
 
 # Ngrok üçün geniş icazələr
-ALLOWED_HOSTS = ["*", ".ngrok-free.app", ".ngrok.app", ".ngrok.io"]
+ALLOWED_HOSTS = ["*", ".ngrok-free.app", ".ngrok.app", ".ngrok.io", "38.242.145.252"]
 
 
 # =======================
@@ -333,7 +333,7 @@ JAZZMIN_UI_TWEAKS = {
 
 # Ngrok üçün CSRF icazəsi
 CSRF_TRUSTED_ORIGINS = [
-    "http://38.242.145.252:8010",
+    "http://38.242.145.252",
     "https://*.ngrok-free.app",
     "https://*.ngrok.app",
     "https://*.ngrok.io",
