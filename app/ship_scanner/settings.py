@@ -16,9 +16,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", default="dev-secret-key")
-DEBUG = env("DEBUG")
+DEBUG = True
 
-# Parse ALLOWED_HOSTS from env OR use defaults
 ALLOWED_HOSTS = env.list(
     "DJANGO_ALLOWED_HOSTS",
     default=[
@@ -28,7 +27,7 @@ ALLOWED_HOSTS = env.list(
         ".ngrok-free.app",
         ".ngrok.app",
         ".ngrok.io",
-        "*",    # Son çarə — ngrok üçün
+        "*",
     ]
 )
 
@@ -37,6 +36,7 @@ ALLOWED_HOSTS = env.list(
 # =======================
 INSTALLED_APPS = [
     "jazzmin",
+
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -44,8 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Apps
-    "scanner",
+    "scanner",   # scanner app
 
     # API
     "rest_framework",
@@ -62,7 +61,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
 
-    "corsheaders.middleware.CorsMiddleware",   # CORS always first (after security)
+    "corsheaders.middleware.CorsMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -72,9 +71,11 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
 ROOT_URLCONF = "ship_scanner.urls"
 
+# =======================
+#     DRF SETTINGS
+# =======================
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
@@ -107,7 +108,7 @@ DATABASES = {
 }
 
 # =======================
-#   PASSWORD VALIDATION
+#     PASSWORD RULES
 # =======================
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -131,11 +132,10 @@ STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = []
 
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ====================================================
-#                JAZZMIN SETTINGS
+#              JAZZMIN SETTINGS
 # ====================================================
 JAZZMIN_SETTINGS = {
     "site_title": "Ship Scanner Admin",
@@ -150,14 +150,11 @@ JAZZMIN_SETTINGS = {
                 "url": "/scan/",
                 "icon": "fas fa-qrcode",
                 "permissions": ["auth.view_user"],
-            },
+            }
         ]
     },
 
-    "icons": {
-        "scanner.ScanLog": "fas fa-history",
-    },
-
+    "icons": {"scanner.ScanLog": "fas fa-history"},
     "show_ui_builder": False,
 }
 
@@ -170,12 +167,9 @@ JAZZMIN_UI_TWEAKS = {
 #              CORS + CSRF SETTINGS
 # ====================================================
 
-# CORS allowed
-CORS_ALLOW_ALL_ORIGINS = True   # Ngrok + Local + IP üçün lazımdır
-
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-# CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost",
     "http://127.0.0.1",
@@ -187,10 +181,19 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.ngrok.io",
 ]
 
-# Ngrok HTTPS fix
+# HTTPS fix for ngrok / proxy setups
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-# Cookie security (HTTPS üçün)
+# Cookie security (HTTP üçün secure söndürüldü)
 SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
+
+# ====================================================
+#   DISABLE COOP/COEP/CORP (HTTP admin işlə­sin deyə)
+# ====================================================
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+CROSS_ORIGIN_OPENER_POLICY = None
+SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = None
+SECURE_CROSS_ORIGIN_RESOURCE_POLICY = None
