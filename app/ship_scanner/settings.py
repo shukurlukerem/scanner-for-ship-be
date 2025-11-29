@@ -6,35 +6,54 @@ from pathlib import Path
 import environ
 import os
 
+# ============================
+#       ENV SETTINGS
+# ============================
 env = environ.Env(DEBUG=(bool, False))
-
-# BASE DIR
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Read .env
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
-# SECURITY
-SECRET_KEY = 'django-insecure-ki035yd3jlo9d3#3z*rl5bm2=qh)i2^rtug2%kj1$+hja*#%vz'
-DEBUG = True
+SECRET_KEY = env("SECRET_KEY", default="dev-secret-key")
+DEBUG = env("DEBUG")
 
-# Ngrok üçün geniş icazələr
-ALLOWED_HOSTS = ["*", ".ngrok-free.app", ".ngrok.app", ".ngrok.io", "38.242.145.252"]
-
+# Parse ALLOWED_HOSTS from env OR use defaults
+ALLOWED_HOSTS = env.list(
+    "DJANGO_ALLOWED_HOSTS",
+    default=[
+        "localhost",
+        "127.0.0.1",
+        "38.242.145.252",
+        ".ngrok-free.app",
+        ".ngrok.app",
+        ".ngrok.io",
+        "*",    # Son çarə — ngrok üçün
+    ]
+)
 
 # =======================
 #     INSTALLED APPS
 # =======================
 INSTALLED_APPS = [
-    "jazzmin",                      # Jazzmin must be first
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # Apps
     "scanner",
+
+    # API
     "rest_framework",
     "drf_spectacular",
     "drf_spectacular_sidecar",
+
+    # CORS
+    "corsheaders",
 ]
 
 # =======================
@@ -42,6 +61,9 @@ INSTALLED_APPS = [
 # =======================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+
+    "corsheaders.middleware.CorsMiddleware",   # CORS always first (after security)
+
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -50,9 +72,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+
 ROOT_URLCONF = "ship_scanner.urls"
-
-
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -78,14 +99,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ship_scanner.wsgi.application"
 
-
 # =======================
 #        DATABASE
 # =======================
 DATABASES = {
     "default": env.db(),
 }
-
 
 # =======================
 #   PASSWORD VALIDATION
@@ -97,7 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-
 # =======================
 #     INTERNATIONAL
 # =======================
@@ -106,23 +124,18 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-
 # =======================
-#     STATIC FILES FIXED
+#     STATIC FILES
 # =======================
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = []
 
 
-# =======================
-#       DEFAULT PK
-# =======================
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 # ====================================================
-#                 JAZZMIN SETTINGS
+#                JAZZMIN SETTINGS
 # ====================================================
 JAZZMIN_SETTINGS = {
     "site_title": "Ship Scanner Admin",
@@ -130,7 +143,6 @@ JAZZMIN_SETTINGS = {
     "site_brand": "Ship Scanner",
     "welcome_sign": "Welcome to Ship Scanner Admin Panel",
 
-    # Custom links (sidebar)
     "custom_links": {
         "scanner": [
             {
@@ -142,7 +154,6 @@ JAZZMIN_SETTINGS = {
         ]
     },
 
-    # Scanner app icons
     "icons": {
         "scanner.ScanLog": "fas fa-history",
     },
@@ -150,41 +161,36 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
 }
 
-
 JAZZMIN_UI_TWEAKS = {
-    "theme": "flatly",           # Light theme
-    "dark_mode_theme": None,     # Disable dark mode
-    "navbar_small_text": False,
-    "footer_small_text": False,
-    "body_small_text": False,
-    "brand_small_text": False,
-    "button_classes": {
-        "primary": "btn-primary",
-        "secondary": "btn-secondary",
-        "info": "btn-info",
-        "warning": "btn-warning",
-        "danger": "btn-danger",
-        "success": "btn-success",
-    },
+    "theme": "flatly",
+    "dark_mode_theme": None,
 }
 
-
 # ====================================================
-#              NGROK COMPATIBLE SETTINGS
+#              CORS + CSRF SETTINGS
 # ====================================================
 
-# Ngrok üçün CSRF icazəsi
+# CORS allowed
+CORS_ALLOW_ALL_ORIGINS = True   # Ngrok + Local + IP üçün lazımdır
+
+CORS_ALLOW_CREDENTIALS = True
+
+# CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
+    "http://localhost",
+    "http://127.0.0.1",
     "http://38.242.145.252",
+    "https://38.242.145.252",
+
     "https://*.ngrok-free.app",
     "https://*.ngrok.app",
     "https://*.ngrok.io",
 ]
 
-# Ngrok HTTPS forward fix
+# Ngrok HTTPS fix
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-# Ngrok + Admin + Login üçün cookie düzəlişləri
+# Cookie security (HTTPS üçün)
 SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True

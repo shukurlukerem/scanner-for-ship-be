@@ -1,11 +1,12 @@
 from django.contrib import admin
-from .models import ScanLog
 from django.utils.html import format_html
-from .models import Worker
+from .models import Worker, ScannerLog
 
-@admin.register(ScanLog)
-class ScanLogAdmin(admin.ModelAdmin):
-    list_display = ("code", "scanned_at")
+@admin.register(ScannerLog)
+class ScannerLogAdmin(admin.ModelAdmin):
+    list_display = ("worker", "scan_type", "scanned_at")
+    list_filter = ("scan_type", "scanned_at")
+    search_fields = ("worker__full_name", "worker__qr_code")
 
 
 @admin.register(Worker)
