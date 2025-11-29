@@ -14,6 +14,7 @@ def scan_view(request):
 
 
 @extend_schema(
+    request=WorkerCreateSerializer,
     summary="Worker üçün QR code yarat",
     description="Full name göndər → base64 QR code yaradır"
 )
