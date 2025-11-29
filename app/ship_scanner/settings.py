@@ -333,6 +333,7 @@ JAZZMIN_UI_TWEAKS = {
 
 # Ngrok üçün CSRF icazəsi
 CSRF_TRUSTED_ORIGINS = [
+    "http://38.242.145.252/",
     "https://*.ngrok-free.app",
     "https://*.ngrok.app",
     "https://*.ngrok.io",
