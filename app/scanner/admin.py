@@ -31,4 +31,17 @@ class WorkerAdmin(admin.ModelAdmin):
                 obj.qr_code
             )
         return "QR code mövcud deyil."
-    qr_image_large.short_description = "QR Kod (Böyük)"
+    qr_image_large.short_description = "QR Kod"
+
+
+    from django.contrib import admin
+from .models import ScannerUser
+
+@admin.register(ScannerUser)
+class ScannerUserAdmin(admin.ModelAdmin):
+    list_display = ("username", "created_at")
+
+    def save_model(self, request, obj, form, change):
+        if 'password' in form.changed_data:
+            obj.set_password(obj.password)
+        super().save_model(request, obj, form, change)

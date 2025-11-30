@@ -28,3 +28,28 @@ class ScannerLog(models.Model):
 
     def __str__(self):
         return f"{self.worker.full_name} - {self.scan_type} - {self.scanned_at}"
+
+from django.contrib.auth.hashers import make_password, check_password
+
+
+class ScannerUser(models.Model):
+    username = models.CharField(max_length=50, unique=True)
+    password = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def set_password(self, raw_pass):
+        self.password = make_password(raw_pass)
+
+    def check_password(self, raw_pass):
+        return check_password(raw_pass, self.password)
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def __str__(self):
+        return self.username

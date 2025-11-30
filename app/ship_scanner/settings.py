@@ -6,17 +6,16 @@ from pathlib import Path
 import environ
 import os
 
-# ============================
-#       ENV SETTINGS
-# ============================
+# ==========================================
+#               ENV SETTINGS
+# ==========================================
 env = environ.Env(DEBUG=(bool, False))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Read .env
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", default="dev-secret-key")
-DEBUG = True
+DEBUG = env("DEBUG", default=True)
 
 ALLOWED_HOSTS = env.list(
     "DJANGO_ALLOWED_HOSTS",
@@ -24,16 +23,15 @@ ALLOWED_HOSTS = env.list(
         "localhost",
         "127.0.0.1",
         "38.242.145.252",
-        ".ngrok-free.app",
-        ".ngrok.app",
-        ".ngrok.io",
+        "kpsraufbey.site",
+        "www.kpsraufbey.site",
         "*",
     ]
 )
 
-# =======================
-#     INSTALLED APPS
-# =======================
+# ==========================================
+#              INSTALLED APPS
+# ==========================================
 INSTALLED_APPS = [
     "jazzmin",
 
@@ -44,45 +42,47 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    "scanner",   # scanner app
+    "scanner",
 
-    # API
     "rest_framework",
     "drf_spectacular",
-    "drf_spectacular_sidecar",
-
-    # CORS
     "corsheaders",
 ]
 
-# =======================
-#       MIDDLEWARE
-# =======================
+# ==========================================
+#               MIDDLEWARE
+# ==========================================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-
     "corsheaders.middleware.CorsMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 ROOT_URLCONF = "ship_scanner.urls"
 
-# =======================
-#     DRF SETTINGS
-# =======================
+# ==========================================
+#               REST FRAMEWORK
+# ==========================================
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "scanner.authentication.ScannerTokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
 }
 
-# =======================
-#         TEMPLATES
-# =======================
+# ==========================================
+#                TEMPLATES
+# ==========================================
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -100,43 +100,40 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ship_scanner.wsgi.application"
 
-# =======================
-#        DATABASE
-# =======================
+# ==========================================
+#                 DATABASE
+# ==========================================
 DATABASES = {
     "default": env.db(),
 }
 
-# =======================
-#     PASSWORD RULES
-# =======================
+# ==========================================
+#         PASSWORD VALIDATION
+# ==========================================
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# =======================
-#     INTERNATIONAL
-# =======================
+# ==========================================
+#               LOCALIZATION
+# ==========================================
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# =======================
-#     STATIC FILES
-# =======================
+# ==========================================
+#               STATIC FILES
+# ==========================================
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = []
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ====================================================
+# ==========================================
 #              JAZZMIN SETTINGS
-# ====================================================
+# ==========================================
 JAZZMIN_SETTINGS = {
     "site_title": "Ship Scanner Admin",
     "site_header": "Ship Scanner",
@@ -149,51 +146,41 @@ JAZZMIN_SETTINGS = {
                 "name": "Scanner Page",
                 "url": "/scan/",
                 "icon": "fas fa-qrcode",
-                "permissions": ["auth.view_user"],
             }
         ]
     },
 
     "icons": {"scanner.ScanLog": "fas fa-history"},
-    "show_ui_builder": False,
 }
 
 JAZZMIN_UI_TWEAKS = {
-    "theme": "flatly",
-    "dark_mode_theme": None,
+    "theme": "flatly"
 }
 
-# ====================================================
-#              CORS + CSRF SETTINGS
-# ====================================================
+# ==========================================
+#                CORS / CSRF
+# ==========================================
+CORS_ALLOW_ALL_ORIGINS = False
 
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost",
-    "http://127.0.0.1",
-    "http://38.242.145.252",
-    "https://38.242.145.252",
-
-    "https://*.ngrok-free.app",
-    "https://*.ngrok.app",
-    "https://*.ngrok.io",
+CORS_ALLOWED_ORIGINS = [
+    "https://kpsraufbey.site",
+    "https://www.kpsraufbey.site",
+    "http://kpsraufbey.site",
+    "http://www.kpsraufbey.site",
 ]
 
-# HTTPS fix for ngrok / proxy setups
+CSRF_TRUSTED_ORIGINS = [
+    "https://kpsraufbey.site",
+    "https://www.kpsraufbey.site",
+    "http://kpsraufbey.site",
+    "http://www.kpsraufbey.site",
+
+    "http://localhost",
+    "http://127.0.0.1",
+    "https://38.242.145.252",
+]
+
+# ==========================================
+#     PROXY / SSL (ngrok / nginx)
+# ==========================================
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
-# Cookie security (HTTP üçün secure söndürüldü)
-SESSION_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-
-# ====================================================
-#   DISABLE COOP/COEP/CORP (HTTP admin işlə­sin deyə)
-# ====================================================
-
-SECURE_CROSS_ORIGIN_OPENER_POLICY = None
-CROSS_ORIGIN_OPENER_POLICY = None
-SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = None
-SECURE_CROSS_ORIGIN_RESOURCE_POLICY = None

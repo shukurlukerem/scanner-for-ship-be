@@ -29,3 +29,7 @@ class ScannerLogListSerializer(serializers.ModelSerializer):
     date = serializers.CharField()
     entry_time = serializers.CharField(allow_null=True)
     exit_time = serializers.CharField(allow_null=True)
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
