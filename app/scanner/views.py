@@ -130,6 +130,29 @@ class WorkerListAPIView(generics.ListAPIView):
 
 
 class ScannedUsersListAPIView(generics.ListAPIView):
-    queryset = ScannerLog.objects.select_related("worker").order_by("-scanned_at")
-    serializer_class = ScannerLogListSerializer
-    pagination_class = DefaultPagination
+    def get(self, request):
+        logs = ScannerLog.objects.select_related("worker").order_by("scanned_at")
+
+        grouped = {}  # worker_id -> data
+
+        for log in logs:
+            worker_id = log.worker.id
+            date_str = log.scanned_at.strftime("%Y-%m-%d")
+
+            key = f"{worker_id}_{date_str}"
+
+            if key not in grouped:
+                grouped[key] = {
+                    "worker_name": log.worker.full_name,
+                    "date": date_str,
+                    "entry_time": None,
+                    "exit_time": None
+                }
+
+            if log.scan_type == "entry":
+                grouped[key]["entry_time"] = log.scanned_at.strftime("%H:%M:%S")
+
+            elif log.scan_type == "exit":
+                grouped[key]["exit_time"] = log.scanned_at.strftime("%H:%M:%S")
+
+        return Response(list(grouped.values()))
