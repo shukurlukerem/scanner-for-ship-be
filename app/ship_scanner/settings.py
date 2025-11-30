@@ -54,11 +54,11 @@ INSTALLED_APPS = [
 # ==========================================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
 
-    "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",   # MUST BE HERE
     "django.middleware.common.CommonMiddleware",
 
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
 
@@ -157,6 +157,7 @@ JAZZMIN_UI_TWEAKS = {
     "theme": "flatly"
 }
 
+
 # ==========================================
 #                CORS / CSRF
 # ==========================================
@@ -167,7 +168,31 @@ CORS_ALLOWED_ORIGINS = [
     "https://www.kpsraufbey.site",
     "http://kpsraufbey.site",
     "http://www.kpsraufbey.site",
+
+    "http://38.242.145.252",
+    "http://38.242.145.252:8010",
+    "https://38.242.145.252",
+    "https://38.242.145.252:8010",
 ]
+
+CORS_ALLOW_HEADERS = [
+    "authorization",
+    "content-type",
+    "x-requested-with",
+]
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "OPTIONS",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_PREFLIGHT_MAX_AGE = 86400
+
 
 CSRF_TRUSTED_ORIGINS = [
     "https://kpsraufbey.site",
@@ -175,10 +200,12 @@ CSRF_TRUSTED_ORIGINS = [
     "http://kpsraufbey.site",
     "http://www.kpsraufbey.site",
 
-    "http://localhost",
-    "http://127.0.0.1",
     "http://38.242.145.252",
+    "http://38.242.145.252:8010",
+    "https://38.242.145.252",
+    "https://38.242.145.252:8010",
 ]
+
 
 # ==========================================
 #     PROXY / SSL (ngrok / nginx)
