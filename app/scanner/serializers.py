@@ -23,3 +23,14 @@ class WorkerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Worker
         fields = ["id", "full_name", "qr_code", "created_at"]
+
+class ScannerLogListSerializer(serializers.ModelSerializer):
+    worker_name = serializers.CharField(source="worker.full_name", read_only=True)
+    time = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ScannerLog
+        fields = ["id", "worker_name", "scan_type", "scanned_at", "time"]
+
+    def get_time(self, obj):
+        return obj.scanned_at.strftime("%H:%M:%S")

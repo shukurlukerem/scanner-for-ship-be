@@ -8,7 +8,7 @@ from drf_spectacular.utils import extend_schema
 from django.utils import timezone
 from datetime import timedelta
 
-from .serializers import WorkerCreateSerializer, WorkerListSerializer
+from .serializers import WorkerCreateSerializer, WorkerListSerializer,ScannerLogListSerializer
 from .pagination import DefaultPagination
 from .models import Worker, ScannerLog
 
@@ -96,6 +96,7 @@ class ScanAPIView(APIView):
             return Response({
                 "worker": worker.full_name,
                 "scan_type": "entry",
+                "time": log.scanned_at.strftime("%H:%M:%S"),
                 "detail": "Giriş qeydə alındı"
             })
 
@@ -104,10 +105,17 @@ class ScanAPIView(APIView):
             return Response({
                 "worker": worker.full_name,
                 "scan_type": "exit",
+                "time": log.scanned_at.strftime("%H:%M:%S"),
                 "detail": "Çıxış qeydə alındı"
             })
         
 class WorkerListAPIView(generics.ListAPIView):
     queryset = Worker.objects.all().order_by("-id")
     serializer_class = WorkerListSerializer
+    pagination_class = DefaultPagination
+
+
+class ScannedUsersListAPIView(generics.ListAPIView):
+    queryset = ScannerLog.objects.select_related("worker").order_by("-scanned_at")
+    serializer_class = ScannerLogListSerializer
     pagination_class = DefaultPagination
