@@ -26,15 +26,21 @@ class GenerateQRAPIView(APIView):
         if not full_name:
             return Response({"detail": "full_name tələb olunur."}, status=400)
 
-        qr_code = generate_qr_base64(full_name)
+        worker = Worker.objects.create(full_name=full_name)
 
-        worker = Worker.objects.create(full_name=full_name, qr_code=qr_code)
+        qr_text = f"WORKER_ID:{worker.id}"
+
+        qr_code_base64 = generate_qr_base64(qr_text)
+
+        worker.qr_code = qr_code_base64
+        worker.save()
 
         return Response({
             "id": worker.id,
             "full_name": worker.full_name,
             "qr_code": worker.qr_code
         }, status=201)
+
 
 
 
@@ -53,7 +59,7 @@ class TodayLogsAPIView(APIView):
             {
                 "worker_name": log.worker.full_name,
                 "scan_type": log.scan_type,
-                "time": log.scanned_at
+                "time": log.scanned_at.strftime("%H:%M:%S")
             }
             for log in logs
         ]
@@ -61,18 +67,25 @@ class TodayLogsAPIView(APIView):
 
 
 
+
 class ScanAPIView(APIView):
-
     def post(self, request):
-        qr = request.data.get("qr_code")
+        qr_text = request.data.get("qr_text")  # front bunu göndərir
 
-        if not qr:
+        if not qr_text:
             return Response({"detail": "QR kod göndərilməyib"}, status=400)
-        worker = Worker.objects.filter(qr_code=qr).first()
 
+        # Gələn mətn "WORKER_ID:12" formatındadır → id-ni çıxarırıq
+        if not qr_text.startswith("WORKER_ID:"):
+            return Response({"detail": "QR formatı yanlışdır"}, status=400)
+
+        worker_id = qr_text.replace("WORKER_ID:", "").strip()
+
+        worker = Worker.objects.filter(id=worker_id).first()
         if not worker:
-            return Response({"detail": "Bu QR kod üzrə işçi tapılmadı"}, status=404)
+            return Response({"detail": "Bu işçi tapılmadı"}, status=404)
 
+        # Eyni gün giriş-çıxış limitləri
         now = timezone.now()
         start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_day = start_of_day + timedelta(days=1)
@@ -108,6 +121,7 @@ class ScanAPIView(APIView):
                 "time": log.scanned_at.strftime("%H:%M:%S"),
                 "detail": "Çıxış qeydə alındı"
             })
+
         
 class WorkerListAPIView(generics.ListAPIView):
     queryset = Worker.objects.all().order_by("-id")
