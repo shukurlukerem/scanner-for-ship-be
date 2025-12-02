@@ -93,8 +93,16 @@ WSGI_APPLICATION = "ship_scanner.wsgi.application"
 #                 DATABASE
 # ==========================================
 DATABASES = {
-    "default": env.db(),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("POSTGRES_DB"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "HOST": env("POSTGRES_HOST"),
+        "PORT": env("POSTGRES_PORT"),
+    }
 }
+
 
 # ==========================================
 #         PASSWORD VALIDATION
