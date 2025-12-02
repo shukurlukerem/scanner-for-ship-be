@@ -17,18 +17,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = env("SECRET_KEY", default="dev-secret-key")
 DEBUG = env("DEBUG", default=True)
 
-ALLOWED_HOSTS = env.list(
-    "DJANGO_ALLOWED_HOSTS",
-    default=[
-        "localhost",
-        "127.0.0.1",
-        "38.242.145.252",
-        "kpsraufbey.site",
-        "www.kpsraufbey.site",
-        "*",
-    ]
-)
-
+ALLOWED_HOSTS = ("*",)
 # ==========================================
 #              INSTALLED APPS
 # ==========================================
@@ -118,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 #               LOCALIZATION
 # ==========================================
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
+TIME_ZONE = "Africa/Khartoum"
 USE_I18N = True
 USE_TZ = True
 
@@ -161,7 +150,7 @@ JAZZMIN_UI_TWEAKS = {
 # ==========================================
 #                CORS / CSRF
 # ==========================================
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
     "https://kpsraufbey.site",
@@ -173,20 +162,18 @@ CORS_ALLOWED_ORIGINS = [
     "http://38.242.145.252:8010",
     "https://38.242.145.252",
     "https://38.242.145.252:8010",
+    "https://07d60843bcdd.ngrok-free.app",
 ]
 
 CORS_ALLOW_HEADERS = [
     "authorization",
     "content-type",
     "x-requested-with",
+    "ngrok-skip-browser-warning"
 ]
 
 CORS_ALLOW_METHODS = [
-    "GET",
-    "POST",
-    "PUT",
-    "DELETE",
-    "OPTIONS",
+    "*",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -204,6 +191,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://38.242.145.252:8010",
     "https://38.242.145.252",
     "https://38.242.145.252:8010",
+    "https://07d60843bcdd.ngrok-free.app",
 ]
 
 

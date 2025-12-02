@@ -1,0 +1,15 @@
+services:
+  api-ship:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: api-ship
+    command: bash -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./app:/code/app
+      - ./staticfiles:/code/app/staticfiles
+    ports:
+      - "8010:8000"
+    env_file:
+      - .env
+    network_mode: host   
