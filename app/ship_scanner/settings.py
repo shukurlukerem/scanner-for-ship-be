@@ -11,13 +11,16 @@ import os
 # ==========================================
 env = environ.Env(DEBUG=(bool, False))
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", default="dev-secret-key")
 DEBUG = env("DEBUG", default=True)
 
-ALLOWED_HOSTS = ("*",)
+ALLOWED_HOSTS = [
+    "*",
+    "46.224.67.166",
+]
+
 # ==========================================
 #              INSTALLED APPS
 # ==========================================
@@ -44,7 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
 
-    "corsheaders.middleware.CorsMiddleware",   # MUST BE HERE
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -57,7 +60,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "ship_scanner.urls"
 
 # ==========================================
-#               REST FRAMEWORK
+#             REST FRAMEWORK
 # ==========================================
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -103,7 +106,6 @@ DATABASES = {
     }
 }
 
-
 # ==========================================
 #         PASSWORD VALIDATION
 # ==========================================
@@ -129,7 +131,7 @@ STATICFILES_DIRS = []
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ==========================================
-#              JAZZMIN SETTINGS
+#             JAZZMIN SETTINGS
 # ==========================================
 JAZZMIN_SETTINGS = {
     "site_title": "Ship Scanner Admin",
@@ -154,56 +156,47 @@ JAZZMIN_UI_TWEAKS = {
     "theme": "flatly"
 }
 
-
 # ==========================================
 #                CORS / CSRF
 # ==========================================
-CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_ALL_ORIGINS = False   # təhlükəsiz & dəqiq
 
 CORS_ALLOWED_ORIGINS = [
-    "https://kpsraufbey.site",
-    "https://www.kpsraufbey.site",
-    "http://kpsraufbey.site",
-    "http://www.kpsraufbey.site",
-
-    "http://38.242.145.252",
-    "http://38.242.145.252:8010",
-    "https://38.242.145.252",
-    "https://38.242.145.252:8010",
-    "https://07d60843bcdd.ngrok-free.app",
+    "http://46.224.67.166:8010",     # FRONTEND serverin
+    "http://localhost:3000",         # local development üçün ehtiyat
 ]
 
+# header-lər
 CORS_ALLOW_HEADERS = [
     "authorization",
     "content-type",
     "x-requested-with",
-    "ngrok-skip-browser-warning"
+    "ngrok-skip-browser-warning",
 ]
 
+# metodlar
 CORS_ALLOW_METHODS = [
-    "*",
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_PREFLIGHT_MAX_AGE = 86400
 
-
+# bu çox vacibdir – CSRF errorlarının 90%-ni həll edir
 CSRF_TRUSTED_ORIGINS = [
-    "https://kpsraufbey.site",
-    "https://www.kpsraufbey.site",
-    "http://kpsraufbey.site",
-    "http://www.kpsraufbey.site",
-
-    "http://38.242.145.252",
-    "http://38.242.145.252:8010",
-    "https://38.242.145.252",
-    "https://38.242.145.252:8010",
-    "https://07d60843bcdd.ngrok-free.app",
+    "http://46.224.67.166:8010",
+    "http://46.224.67.166",
+    "https://46.224.67.166",
 ]
 
-
 # ==========================================
-#     PROXY / SSL (ngrok / nginx)
+#           PROXY / SSL HEADERS
 # ==========================================
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
