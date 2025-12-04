@@ -12,4 +12,3 @@ services:
       - "8010:8000"
     env_file:
       - .env
-    network_mode: host   

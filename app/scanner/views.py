@@ -133,9 +133,18 @@ class ScanAPIView(APIView):
 
         count = today_logs.count()
 
+        # ===============================
+        #     LIMIT CHECK (max 2 scans)
+        # ===============================
         if count >= 2:
-            return Response({"detail": "Worker already scanned twice today"}, status=403)
+            return Response(
+                {"detail": "This worker has already scanned twice today"},
+                status=403
+            )
 
+        # ===============================
+        #      FIRST SCAN → ENTRY
+        # ===============================
         if count == 0:
             log = ScannerLog.objects.create(worker=worker, scan_type="entry")
             return Response({
@@ -145,7 +154,26 @@ class ScanAPIView(APIView):
                 "detail": "Entry recorded"
             })
 
+        # ===============================
+        #   SECOND SCAN (EXIT) — MUST WAIT 15 MINUTES
+        # ===============================
         if count == 1:
+            first_log = today_logs.first()
+            diff = now - first_log.scanned_at
+
+            # 15 minutes = 900 seconds
+            if diff.total_seconds() < 900:
+                remaining = int(900 - diff.total_seconds())
+                minutes = remaining // 60
+                seconds = remaining % 60
+
+                return Response(
+                    {
+                        "detail": f"Exit scan is not allowed yet. Please wait {minutes} minutes and {seconds} seconds."
+                    },
+                    status=403
+                )
+
             log = ScannerLog.objects.create(worker=worker, scan_type="exit")
             return Response({
                 "worker": worker.full_name,
@@ -153,6 +181,7 @@ class ScanAPIView(APIView):
                 "time": log.scanned_at.strftime("%H:%M:%S"),
                 "detail": "Exit recorded"
             })
+
 
 
 class WorkerListAPIView(generics.ListAPIView):
