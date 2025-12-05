@@ -164,9 +164,11 @@ JAZZMIN_UI_TWEAKS = {
 CORS_ALLOW_ALL_ORIGINS = False   # təhlükəsiz & dəqiq
 
 CORS_ALLOWED_ORIGINS = [
-    "http://46.224.67.166:8010",     # FRONTEND serverin
-    "http://localhost",         # local development üçün ehtiyat
+    "http://46.224.67.166:8010",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
 ]
+
 
 # header-lər
 CORS_ALLOW_HEADERS = [
@@ -194,7 +196,10 @@ CSRF_TRUSTED_ORIGINS = [
     "http://46.224.67.166:8010",
     "http://46.224.67.166",
     "https://46.224.67.166",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
 ]
+
 
 # ==========================================
 #           PROXY / SSL HEADERS
