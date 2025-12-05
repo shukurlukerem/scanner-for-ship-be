@@ -33,3 +33,7 @@ class ScannerLogListSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
+
+class ScannerLogDeleteSerializer(serializers.Serializer):
+    class Meta:
+        fields = ["id", "full_name",]

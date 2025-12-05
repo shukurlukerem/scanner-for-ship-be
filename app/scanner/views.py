@@ -10,7 +10,7 @@ from openpyxl import Workbook
 from drf_spectacular.utils import extend_schema
 
 from .utils import generate_qr_base64
-from .serializers import WorkerListSerializer, LoginSerializer
+from .serializers import WorkerListSerializer, LoginSerializer, ScannerLogDeleteSerializer
 from .pagination import DefaultPagination
 from .models import Worker, ScannerLog, ScannerUser
 from .authentication import ScannerTokenAuthentication
@@ -291,31 +291,40 @@ class WorkerDeleteAPIView(generics.DestroyAPIView):
     lookup_field = "id"
 
 
-class ScannerLogDeleteAPIView(APIView):
-    authentication_classes = [ScannerTokenAuthentication]
+@extend_schema(
+    description="Verilmiş ID-ə uyğun Workeri silir"
+)
+class LogDeleteAPIView(generics.DestroyAPIView):
+    queryset = Worker.objects.all()
+    serializer_class = ScannerLogDeleteSerializer
     permission_classes = [IsAuthenticated]
+    lookup_field = "id"
 
-    @extend_schema(
-        request=serializers.DictField(),
-        responses={200: serializers.DictField()},
-        description="ScannerLog modelindən id-ə əsasən log silir (DELETE)"
-    )
-    def delete(self, request):
-        log_id = request.data.get("id")
+# class ScannerLogDeleteAPIView(APIView):
+#     authentication_classes = [ScannerTokenAuthentication]
+#     permission_classes = [IsAuthenticated]
 
-        if not log_id:
-            return Response({"detail": "id is required"}, status=400)
+#     @extend_schema(
+#         request=serializers.DictField(),
+#         responses={200: serializers.DictField()},
+#         description="ScannerLog modelindən id-ə əsasən log silir (DELETE)"
+#     )
+#     def delete(self, request):
+#         log_id = request.data.get("id")
 
-        log = ScannerLog.objects.filter(id=log_id).first()
-        if not log:
-            return Response({"detail": "Log not found"}, status=404)
+#         if not log_id:
+#             return Response({"detail": "id is required"}, status=400)
 
-        log.delete()
+#         log = ScannerLog.objects.filter(id=log_id).first()
+#         if not log:
+#             return Response({"detail": "Log not found"}, status=404)
 
-        return Response(
-            {
-                "success": True,
-                "detail": f"Log #{log_id} deleted successfully"
-            },
-            status=200
-        )
+#         log.delete()
+
+#         return Response(
+#             {
+#                 "success": True,
+#                 "detail": f"Log #{log_id} deleted successfully"
+#             },
+#             status=200
+#         )
