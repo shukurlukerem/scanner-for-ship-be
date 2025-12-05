@@ -291,41 +291,47 @@ class WorkerDeleteAPIView(generics.DestroyAPIView):
     lookup_field = "id"
 
 
-@extend_schema(
-    description="Verilmiş ID-ə uyğun ScannerLog-u silir"
-)
-class LogDeleteAPIView(generics.DestroyAPIView):
-    queryset = ScannerLog.objects.all()
-    serializer_class = ScannerLogDeleteSerializer
-    permission_classes = [IsAuthenticated]
-    lookup_field = "id"
-
-
-# class ScannerLogDeleteAPIView(APIView):
-#     authentication_classes = [ScannerTokenAuthentication]
+# @extend_schema(
+#     description="Verilmiş ID-ə uyğun ScannerLog-u silir"
+# )
+# class LogDeleteAPIView(generics.DestroyAPIView):
+#     queryset = ScannerLog.objects.all()
+#     serializer_class = ScannerLogDeleteSerializer
 #     permission_classes = [IsAuthenticated]
+#     lookup_field = "id"
 
-#     @extend_schema(
-#         request=serializers.DictField(),
-#         responses={200: serializers.DictField()},
-#         description="ScannerLog modelindən id-ə əsasən log silir (DELETE)"
-#     )
-#     def delete(self, request):
-#         log_id = request.data.get("id")
+class ScannerLogDeleteAPIView(APIView):
+    authentication_classes = [ScannerTokenAuthentication]
+    # permission_classes = [IsAuthenticated]
 
-#         if not log_id:
-#             return Response({"detail": "id is required"}, status=400)
+    @extend_schema(
+        request=serializers.DictField(),
+        responses={200: serializers.DictField()},
+        description="Worker ID əsasında həmin işçiyə aid yalnız SON logu silir"
+    )
+    def delete(self, request):
+        worker_id = request.data.get("id")
 
-#         log = ScannerLog.objects.filter(id=log_id).first()
-#         if not log:
-#             return Response({"detail": "Log not found"}, status=404)
+        if not worker_id:
+            return Response({"detail": "id (worker_id) is required"}, status=400)
 
-#         log.delete()
+        worker = Worker.objects.filter(id=worker_id).first()
+        if not worker:
+            return Response({"detail": "Worker not found"}, status=404)
 
-#         return Response(
-#             {
-#                 "success": True,
-#                 "detail": f"Log #{log_id} deleted successfully"
-#             },
-#             status=200
-#         )
+        # Həmin işçiyə aid SON (ən yeni) log
+        last_log = ScannerLog.objects.filter(worker=worker).order_by("-scanned_at").first()
+
+        if not last_log:
+            return Response({"detail": "No logs found for this worker"}, status=404)
+
+        last_log_id = last_log.id
+        last_log.delete()
+
+        return Response(
+            {
+                "success": True,
+                "detail": f"Last log (ID: {last_log_id}) for worker '{worker.full_name}' was deleted"
+            },
+            status=200
+        )
