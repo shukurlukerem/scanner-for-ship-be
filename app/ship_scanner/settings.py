@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "scanner",
-    "startups",
 
     "rest_framework",
     "drf_spectacular",

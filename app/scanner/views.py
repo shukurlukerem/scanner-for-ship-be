@@ -279,3 +279,13 @@ class ExportTodayExcelAPIView(APIView):
 
         wb.save(response)
         return response
+
+
+@extend_schema(
+    description="Verilmiş ID-ə uyğun Workeri silir"
+)
+class WorkerDeleteAPIView(generics.DestroyAPIView):
+    queryset = Worker.objects.all()
+    serializer_class = WorkerListSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = "id"
