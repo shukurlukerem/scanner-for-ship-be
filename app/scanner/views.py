@@ -289,3 +289,46 @@ class WorkerDeleteAPIView(generics.DestroyAPIView):
     serializer_class = WorkerListSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = "id"
+
+
+class ScannerLogDeleteAPIView(APIView):
+    authentication_classes = [ScannerTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=serializers.DictField(),
+        responses={200: serializers.DictField()},
+        description="QR text və Log ID əsasında ScannerLog silir"
+    )
+    def post(self, request):
+        qr_text = request.data.get("qr_text")
+        log_id = request.data.get("log_id")
+
+        if not qr_text:
+            return Response({"detail": "qr_text is required"}, status=400)
+
+        if not log_id:
+            return Response({"detail": "log_id is required"}, status=400)
+
+        if not qr_text.startswith("WORKER_ID:"):
+            return Response({"detail": "Invalid QR format"}, status=400)
+
+        worker_id = qr_text.replace("WORKER_ID:", "").strip()
+
+        worker = Worker.objects.filter(id=worker_id).first()
+        if not worker:
+            return Response({"detail": "Worker not found"}, status=404)
+
+        log = ScannerLog.objects.filter(id=log_id, worker=worker).first()
+        if not log:
+            return Response({"detail": "Log not found or does not belong to this worker"}, status=404)
+
+        log.delete()
+
+        return Response(
+            {
+                "success": True,
+                "detail": f"Log #{log_id} deleted for worker {worker.full_name}"
+            },
+            status=200
+        )
