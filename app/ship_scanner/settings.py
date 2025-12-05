@@ -19,6 +19,7 @@ DEBUG = env("DEBUG", default=True)
 ALLOWED_HOSTS = [
     "*",
     "46.224.67.166",
+    "localhost",
 ]
 
 # ==========================================
@@ -164,7 +165,7 @@ CORS_ALLOW_ALL_ORIGINS = False   # təhlükəsiz & dəqiq
 
 CORS_ALLOWED_ORIGINS = [
     "http://46.224.67.166:8010",     # FRONTEND serverin
-    "http://localhost:3000",         # local development üçün ehtiyat
+    "http://localhost",         # local development üçün ehtiyat
 ]
 
 # header-lər
