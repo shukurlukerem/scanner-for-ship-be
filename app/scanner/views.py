@@ -292,13 +292,14 @@ class WorkerDeleteAPIView(generics.DestroyAPIView):
 
 
 @extend_schema(
-    description="Verilmiş ID-ə uyğun Workeri silir"
+    description="Verilmiş ID-ə uyğun ScannerLog-u silir"
 )
 class LogDeleteAPIView(generics.DestroyAPIView):
-    queryset = Worker.objects.all()
+    queryset = ScannerLog.objects.all()
     serializer_class = ScannerLogDeleteSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = "id"
+
 
 # class ScannerLogDeleteAPIView(APIView):
 #     authentication_classes = [ScannerTokenAuthentication]
