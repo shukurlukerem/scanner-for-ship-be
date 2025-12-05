@@ -8,7 +8,7 @@ from .views import (GenerateQRAPIView,
                     ExportTodayExcelAPIView,
                     LoginAPIView,
                     WorkerDeleteAPIView,
-                    LogDeleteAPIView)
+                    ScannerLogDeleteAPIView)
 
 urlpatterns = [
     path("generate-qr/", GenerateQRAPIView.as_view(), name="generate-qr"),
@@ -19,5 +19,5 @@ urlpatterns = [
     path("export-excel/", ExportTodayExcelAPIView.as_view(), name="export-excel"),
     path("login/", LoginAPIView.as_view(), name="login"),
     path("workers/<int:id>/", WorkerDeleteAPIView.as_view(), name="worker-delete"),
-    path("log/delete/<int:id>/", LogDeleteAPIView.as_view()),
+    path("log/delete/<int:id>/", ScannerLogDeleteAPIView.as_view()),
 ]
